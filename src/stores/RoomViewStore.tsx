@@ -52,6 +52,7 @@ import { ModuleRunner } from "../modules/ModuleRunner";
 import { setMarkedUnreadState } from "../utils/notifications";
 import { ConnectionState, ElementCall } from "../models/Call";
 import { isVideoRoom } from "../utils/video-rooms";
+import { ElementCallSettingsEventType, type ElementCallSettingsContent } from "../call-types";
 
 const NUM_JOIN_RETRY = 5;
 
@@ -361,7 +362,17 @@ export class RoomViewStore extends EventEmitter {
                 call.presented = true;
                 // Immediately start the call. This will connect to all required widget events
                 // and allow the widget to show the lobby.
-                if (call.connectionState === ConnectionState.Disconnected) call.start({ skipLobby: payload.skipLobby });
+                if (call.connectionState === ConnectionState.Disconnected) {
+                    // Read room-specific call settings
+                    const callSettingsEvent = room.currentState.getStateEvents(ElementCallSettingsEventType, "");
+                    const callSettings = callSettingsEvent?.getContent<ElementCallSettingsContent>() ?? {};
+                    
+                    // Use payload skipLobby if provided, otherwise use room setting
+                    const skipLobby = payload.skipLobby ?? callSettings.skipLobby ?? false;
+                    const audioMuted = callSettings.audioMuted ?? false;
+                    
+                    call.start({ skipLobby, audioMuted });
+                }
             }
             // If we switch to a different room from the call, we are no longer presenting it
             const prevRoomCall = this.state.roomId ? CallStore.instance.getCall(this.state.roomId) : null;

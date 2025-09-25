@@ -23,3 +23,16 @@ export interface JitsiCallMemberContent {
 export const ElementCallEventType = new NamespacedValue(null, EventType.GroupCallPrefix);
 
 export const ElementCallMemberEventType = new NamespacedValue(null, EventType.GroupCallMemberPrefix);
+
+export const ElementCallSettingsEventType = "io.element.call.settings";
+
+export interface ElementCallSettingsContent {
+    /**
+     * Skip showing the lobby screen when joining a call
+     */
+    skipLobby?: boolean;
+    /**
+     * Join with audio muted by default
+     */
+    audioMuted?: boolean;
+}
