@@ -17,7 +17,12 @@ import SettingsTab from "../SettingsTab";
 import { useRoomState } from "../../../../../hooks/useRoomState";
 import SdkConfig, { DEFAULTS } from "../../../../../SdkConfig";
 import { SettingsSection } from "../../shared/SettingsSection";
-import { ElementCallEventType, ElementCallMemberEventType } from "../../../../../call-types";
+import {
+    ElementCallEventType,
+    ElementCallMemberEventType,
+    ElementCallSettingsEventType,
+    type ElementCallSettingsContent,
+} from "../../../../../call-types";
 
 interface ElementCallSwitchProps {
     room: Room;
@@ -87,6 +92,79 @@ const ElementCallSwitch: React.FC<ElementCallSwitchProps> = ({ room }) => {
     );
 };
 
+interface ElementCallSettingsSwitchProps {
+    room: Room;
+}
+
+const ElementCallSettingsSwitch: React.FC<ElementCallSettingsSwitchProps> = ({ room }) => {
+    const [callSettings, maySendSettings] = useRoomState(
+        room,
+        useCallback(
+            (state: RoomState) => {
+                const settingsEvent = state.getStateEvents(ElementCallSettingsEventType, "");
+                const content = settingsEvent?.getContent<ElementCallSettingsContent>() ?? {};
+                return [
+                    content,
+                    state?.maySendStateEvent(ElementCallSettingsEventType, room.client.getSafeUserId()),
+                ] as const;
+            },
+            [room.client],
+        ),
+    );
+
+    const [skipLobby, setSkipLobby] = useState<boolean>(callSettings.skipLobby ?? false);
+    const [audioMuted, setAudioMuted] = useState<boolean>(callSettings.audioMuted ?? false);
+
+    const onSkipLobbyChange = useCallback(
+        (enabled: boolean): void => {
+            setSkipLobby(enabled);
+            const newContent: ElementCallSettingsContent = { ...callSettings, skipLobby: enabled };
+            room.client.sendStateEvent(room.roomId, ElementCallSettingsEventType as any, newContent);
+        },
+        [room.client, room.roomId, callSettings],
+    );
+
+    const onAudioMutedChange = useCallback(
+        (enabled: boolean): void => {
+            setAudioMuted(enabled);
+            const newContent: ElementCallSettingsContent = { ...callSettings, audioMuted: enabled };
+            room.client.sendStateEvent(room.roomId, ElementCallSettingsEventType as any, newContent);
+        },
+        [room.client, room.roomId, callSettings],
+    );
+
+    // Update local state when room state changes
+    React.useEffect(() => {
+        setSkipLobby(callSettings.skipLobby ?? false);
+        setAudioMuted(callSettings.audioMuted ?? false);
+    }, [callSettings]);
+
+    const noPermissionsTooltip = _t("room_settings|voip|enable_element_call_no_permissions_tooltip");
+
+    return (
+        <>
+            <LabelledToggleSwitch
+                data-testid="skip-lobby-switch"
+                label={_t("room_settings|voip|skip_lobby_label")}
+                caption={_t("room_settings|voip|skip_lobby_caption")}
+                value={skipLobby}
+                onChange={onSkipLobbyChange}
+                disabled={!maySendSettings}
+                tooltip={noPermissionsTooltip}
+            />
+            <LabelledToggleSwitch
+                data-testid="audio-muted-switch"
+                label={_t("room_settings|voip|audio_muted_default_label")}
+                caption={_t("room_settings|voip|audio_muted_default_caption")}
+                value={audioMuted}
+                onChange={onAudioMutedChange}
+                disabled={!maySendSettings}
+                tooltip={noPermissionsTooltip}
+            />
+        </>
+    );
+};
+
 interface Props {
     room: Room;
 }
@@ -97,6 +175,9 @@ export const VoipRoomSettingsTab: React.FC<Props> = ({ room }) => {
             <SettingsSection heading={_t("settings|voip|title")}>
                 <SettingsSubsection heading={_t("room_settings|voip|call_type_section")}>
                     <ElementCallSwitch room={room} />
+                </SettingsSubsection>
+                <SettingsSubsection heading={_t("room_settings|voip|call_settings_section")}>
+                    <ElementCallSettingsSwitch room={room} />
                 </SettingsSubsection>
             </SettingsSection>
         </SettingsTab>

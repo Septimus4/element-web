@@ -556,6 +556,10 @@ export interface WidgetGenerationParameters {
      * Skip showing the lobby screen of a call.
      */
     skipLobby?: boolean;
+    /**
+     * Join with audio muted by default.
+     */
+    audioMuted?: boolean;
 }
 
 /**
@@ -693,6 +697,10 @@ export class ElementCall extends Call {
 
         if (typeof opts.skipLobby === "boolean") {
             params.set("skipLobby", opts.skipLobby.toString());
+        }
+
+        if (typeof opts.audioMuted === "boolean") {
+            params.set("audioMuted", opts.audioMuted.toString());
         }
 
         const rageshakeSubmitUrl = SdkConfig.get("bug_report_endpoint_url");

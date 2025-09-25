@@ -2473,7 +2473,12 @@
             "call_type_section": "Call type",
             "enable_element_call_caption": "%(brand)s is end-to-end encrypted, but is currently limited to smaller numbers of users.",
             "enable_element_call_label": "Enable %(brand)s as an additional calling option in this room",
-            "enable_element_call_no_permissions_tooltip": "You do not have sufficient permissions to change this."
+            "enable_element_call_no_permissions_tooltip": "You do not have sufficient permissions to change this.",
+            "skip_lobby_label": "Skip lobby when joining call",
+            "skip_lobby_caption": "Bypass the pre-call lobby and join calls directly",
+            "audio_muted_default_label": "Join with audio muted by default",
+            "audio_muted_default_caption": "New call participants will start with their microphone muted",
+            "call_settings_section": "Call settings"
         }
     },
     "room_summary_card_back_action_label": "Room info",
