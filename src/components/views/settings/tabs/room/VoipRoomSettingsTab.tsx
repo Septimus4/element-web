@@ -17,7 +17,12 @@ import SettingsTab from "../SettingsTab";
 import { useRoomState } from "../../../../../hooks/useRoomState";
 import SdkConfig, { DEFAULTS } from "../../../../../SdkConfig";
 import { SettingsSection } from "../../shared/SettingsSection";
-import { ElementCallEventType, ElementCallMemberEventType, ElementCallSettingsEventType, type ElementCallSettingsContent } from "../../../../../call-types";
+import {
+    ElementCallEventType,
+    ElementCallMemberEventType,
+    ElementCallSettingsEventType,
+    type ElementCallSettingsContent,
+} from "../../../../../call-types";
 
 interface ElementCallSwitchProps {
     room: Room;

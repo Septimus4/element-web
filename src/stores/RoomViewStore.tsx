@@ -366,11 +366,11 @@ export class RoomViewStore extends EventEmitter {
                     // Read room-specific call settings
                     const callSettingsEvent = room.currentState.getStateEvents(ElementCallSettingsEventType, "");
                     const callSettings = callSettingsEvent?.getContent<ElementCallSettingsContent>() ?? {};
-                    
+
                     // Use payload skipLobby if provided, otherwise use room setting
                     const skipLobby = payload.skipLobby ?? callSettings.skipLobby ?? false;
                     const audioMuted = callSettings.audioMuted ?? false;
-                    
+
                     call.start({ skipLobby, audioMuted });
                 }
             }
